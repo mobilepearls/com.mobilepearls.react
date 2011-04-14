@@ -12,10 +12,4 @@
               android:autoLink="web"
               android:textColor="#FFFFFF"/>
 
-    <Button	android:id="@+id/closeButton"
- 			android:text="Back"
- 			android:layout_width="fill_parent"
- 			android:layout_height="wrap_content"
- 			android:layout_alignParentBottom="true" />
-
 </RelativeLayout>

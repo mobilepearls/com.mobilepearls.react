@@ -11,9 +11,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,37 +25,16 @@ public class ReactHighScoresActivity extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(com.mobilepearls.react.R.layout.highscorelist);
 
 		ReactHighScoreDatabase db = ReactHighScoreDatabase.getDatabase(this);
 		final List<String> list = new ArrayList<String>();
 		for (HighScoreEntry entry : db.getSortedHighScores()) {
-			list.add(entry.score + " ms - " + entry.name);
+			list.add(entry.score / ReactView.NUMBER_OF_CLICKS + " ms - " + entry.name);
 		}
 
 		setListAdapter(new ArrayAdapter<String>(this, R.layout.simple_list_item_1, list));
-
-		Button closeButton = (Button) findViewById(com.mobilepearls.react.R.id.aboutBackButton);
-		closeButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
-
-//		Intent intent = getIntent();
-//		Bundle extras = intent.getExtras();
-//		if (extras != null && extras.getBoolean(JUST_STORED)) {
-//			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//			alert.setMessage("Do you want to share your high score?");
-//			alert.setNegativeButton("No", null);
-//			alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//				public void onClick(DialogInterface dialog, int whichButton) {
-//					share();
-//				}
-//			});
-//			alert.show();
-//		}
 	}
 
 	public void onListItemClick(ListView parent, View v, int position, long id) {

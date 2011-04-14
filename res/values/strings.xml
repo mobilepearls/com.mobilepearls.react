@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, ReactionActivity!</string>
     <string name="app_name">React!</string>
+    <string name="restart_menuitem_text">Restart</string>
+	<string name="highscore_menuitem_text">High Score</string>
+	<string name="about_menuitem_text">About</string>
 </resources>

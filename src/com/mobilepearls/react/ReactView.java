@@ -15,23 +15,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
-import android.os.Vibrator;
 import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.view.HapticFeedbackConstants;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 
-public class ReactView extends View implements OnClickListener {
+public class ReactView extends View {
 
 	private static final int STATE_START = 1;
 	private static final int STATE_WAITING = 2;
 	private static final int STATE_RED = 3;
 	private static final int STATE_AFTER_CHEAT = 4;
 
-	private static final int NUMBER_OF_CLICKS = 10;
+	public static final int NUMBER_OF_CLICKS = 10;
 
 	private int state = STATE_START;
 	private int clicks;
@@ -43,14 +41,8 @@ public class ReactView extends View implements OnClickListener {
 	private final Random random = new Random();
 	private long lastClick;
 
-	public void vibrate() {
-		Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-		vibrator.vibrate(1000);
-	}
-
 	public ReactView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setOnClickListener(this);
 		textPaint.setColor(Color.WHITE);
 		textPaint.setAntiAlias(true);
 		textPaint.setTextAlign(Align.CENTER);
@@ -72,7 +64,7 @@ public class ReactView extends View implements OnClickListener {
 	}
 
 	private void startTurnRedTimer() {
-		long delay = 2000 + random.nextInt(6000);
+		long delay = 1200 + random.nextInt(5000);
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -80,8 +72,9 @@ public class ReactView extends View implements OnClickListener {
 					@Override
 					public void run() {
 						state = STATE_RED;
-						startTime = System.currentTimeMillis();
+						ReactSoundManager.playCorrect();
 						invalidate();
+						startTime = System.currentTimeMillis();
 					}
 				});
 			}
@@ -94,8 +87,6 @@ public class ReactView extends View implements OnClickListener {
 	}
 
 	private void stateChange() {
-		performHapticFeedback(HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING/* =1=VIRTUAL_KEY */);
-
 		switch (state) {
 		case STATE_START:
 			lastClick = System.currentTimeMillis();
@@ -111,7 +102,7 @@ public class ReactView extends View implements OnClickListener {
 			}
 			timer.cancel();
 			timer = new Timer(true);
-			vibrate();
+			ReactSoundManager.playIncorrect();
 			state = STATE_AFTER_CHEAT;
 			break;
 		case STATE_RED:
@@ -121,7 +112,7 @@ public class ReactView extends View implements OnClickListener {
 			clicks++;
 			startTime = -1;
 			if (clicks == NUMBER_OF_CLICKS) {
-				vibrate();
+				ReactSoundManager.playGameDone();
 				gameOver();
 			} else {
 				startTurnRedTimer();
@@ -129,19 +120,24 @@ public class ReactView extends View implements OnClickListener {
 			}
 			break;
 		case STATE_AFTER_CHEAT:
-			((Activity) getContext()).finish();
+			restart();
 			return;
 		}
 		invalidate();
 	}
 
-	private void gameOver() {
-		final int totalTimeCopy = totalTime;
-
+	void restart() {
 		state = STATE_START;
 		clicks = 0;
 		totalTime = 0;
+		timer.cancel();
+		timer = new Timer();
 		invalidate();
+	}
+
+	private void gameOver() {
+		final int totalTimeCopy = totalTime;
+		restart();
 
 		final ReactHighScoreDatabase db = ReactHighScoreDatabase.getDatabase(getContext());
 		int position = db.getPositionForScore(totalTimeCopy);
@@ -157,7 +153,7 @@ public class ReactView extends View implements OnClickListener {
 			alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					((Activity) getContext()).finish();
+					getContext().startActivity(new Intent(getContext(), ReactGameActivity.class));
 				}
 			});
 		} else {
@@ -180,7 +176,6 @@ public class ReactView extends View implements OnClickListener {
 					Intent intent = new Intent();
 					intent.setClass(getContext(), ReactHighScoresActivity.class);
 					intent.putExtra(ReactHighScoresActivity.JUST_STORED, true);
-					((Activity) getContext()).finish();
 					getContext().startActivity(intent);
 				}
 			});
@@ -190,8 +185,11 @@ public class ReactView extends View implements OnClickListener {
 	}
 
 	@Override
-	public void onClick(View v) {
+	public boolean onTouchEvent(MotionEvent event) {
+		if (event.getAction() != MotionEvent.ACTION_DOWN)
+			return false;
 		stateChange();
+		return super.onTouchEvent(event);
 	}
 
 	private void drawCenteredText(Canvas canvas, String... text) {
@@ -217,9 +215,9 @@ public class ReactView extends View implements OnClickListener {
 			break;
 		case STATE_WAITING:
 			canvas.drawColor(Color.BLACK);
-			String lastString = (lastTime == -1) ? "" : "Last: " + lastTime + " ms";
-			drawCenteredText(canvas, "Reactions: " + clicks + "/" + NUMBER_OF_CLICKS, "", "Time: " + totalTime + " ms",
-					"", lastString);
+			String lastString = (clicks == 0) ? "" : "Last: " + lastTime + " ms";
+			drawCenteredText(canvas, "Reactions: " + clicks + "/" + NUMBER_OF_CLICKS, "", "Average: "
+					+ (clicks == 0 ? 0 : totalTime / clicks) + " ms", "", lastString);
 			break;
 		case STATE_RED:
 			canvas.drawColor(Color.RED);

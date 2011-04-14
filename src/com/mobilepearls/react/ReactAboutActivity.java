@@ -5,9 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.Window;
 import android.widget.TextView;
 
 public class ReactAboutActivity extends Activity {
@@ -15,6 +13,7 @@ public class ReactAboutActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.about);
 
 		try {
@@ -25,13 +24,6 @@ public class ReactAboutActivity extends Activity {
 			Log.e(getClass().getSimpleName(), e.getMessage(), e);
 		}
 
-		Button backButton = (Button) findViewById(R.id.closeButton);
-		backButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
 	}
 
 }

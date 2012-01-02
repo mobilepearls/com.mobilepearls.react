@@ -43,6 +43,14 @@ public class ReactView extends View {
 
 	public ReactView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+
+		setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				stateChange();
+			}
+		});
+
 		textPaint.setColor(Color.WHITE);
 		textPaint.setAntiAlias(true);
 		textPaint.setTextAlign(Align.CENTER);
@@ -189,7 +197,7 @@ public class ReactView extends View {
 		if (event.getAction() != MotionEvent.ACTION_DOWN)
 			return false;
 		stateChange();
-		return super.onTouchEvent(event);
+		return true;
 	}
 
 	private void drawCenteredText(Canvas canvas, String... text) {

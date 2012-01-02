@@ -7,21 +7,25 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup.LayoutParams;
 
 public class ReactGameActivity extends Activity {
+
+	private ReactView view;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		ReactSoundManager.initSounds(this);
+
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-		setContentView(R.layout.main);
-
-		ReactView view = (ReactView) findViewById(R.id.reactionview);
+		view = new ReactView(this, null);
+		view.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		view.setFocusable(true);
 		view.setFocusableInTouchMode(true);
-		view.requestFocus();
+		setContentView(view);
 	}
 
 	@Override
@@ -35,7 +39,6 @@ public class ReactGameActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.restart_menuitem:
-			ReactView view = (ReactView) findViewById(R.id.reactionview);
 			view.restart();
 			return true;
 		case R.id.highscore_menuitem:

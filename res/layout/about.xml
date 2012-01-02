@@ -8,7 +8,7 @@
               android:layout_width="fill_parent" 
               android:layout_height="fill_parent"
               android:textSize="18dip"
-              android:text="React! $VERSION$\n\nby Mobile Pearls\nhttp://mobilepearls.com/"
+              android:text="@string/about_text"
               android:autoLink="web"
               android:textColor="#FFFFFF"/>
 

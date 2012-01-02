@@ -4,11 +4,11 @@
 	android:layout_height="fill_parent" android:gravity="center_vertical">
 
 	<ListView android:id="@+id/android:list" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:layout_weight="1" android:textSize="18dip"/>
+		android:layout_height="fill_parent" android:textSize="18dip"/>
 
 	<TextView android:id="@+id/android:empty"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:textSize="18dip" android:text="No high score!" android:gravity="center"
-		android:layout_weight="1" android:textColor="#FFFFFF"/>
+		android:textSize="18dip" android:text="@string/no_high_score" android:gravity="center"
+		android:textColor="#FFFFFF"/>
 
 </RelativeLayout>
